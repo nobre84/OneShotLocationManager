@@ -17,7 +17,7 @@ enum OneShotLocationManagerErrors: Int {
     case InvalidLocation
 }
 
-class OneShotLocationManager: NSObject, CLLocationManagerDelegate {
+public class OneShotLocationManager: NSObject, CLLocationManagerDelegate {
     
     //location manager
     private var locationManager: CLLocationManager?
@@ -28,7 +28,7 @@ class OneShotLocationManager: NSObject, CLLocationManagerDelegate {
         locationManager = nil
     }
     
-    typealias LocationClosure = ((location: CLLocation?, error: NSError?)->())
+    public typealias LocationClosure = ((location: CLLocation?, error: NSError?)->())
     private var didComplete: LocationClosure?
 
     //location manager returned, call didcomplete closure
@@ -40,7 +40,7 @@ class OneShotLocationManager: NSObject, CLLocationManagerDelegate {
     }
     
     //location authorization status changed
-    func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+    public func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
         
         switch status {
         case .AuthorizedWhenInUse:
@@ -54,13 +54,13 @@ class OneShotLocationManager: NSObject, CLLocationManagerDelegate {
         }
     }
     
-    internal func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
+    public func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         _didComplete(nil, error: error)
     }
     
-    internal func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
-        if let location = locations[0] as? CLLocation {
-            _didComplete(location, error: nil)
+    public func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if locations.count > 0 {
+            _didComplete(locations[0], error: nil)
         } else {
             _didComplete(nil, error: NSError(domain: self.classForCoder.description(),
                 code: OneShotLocationManagerErrors.InvalidLocation.rawValue,
@@ -69,7 +69,7 @@ class OneShotLocationManager: NSObject, CLLocationManagerDelegate {
     }
     
     //ask for location permissions, fetch 1 location, and return
-    func fetchWithCompletion(completion: LocationClosure) {
+    public func fetchWithCompletion(completion: LocationClosure) {
         //store the completion closure
         didComplete = completion
 
